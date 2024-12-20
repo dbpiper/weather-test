@@ -131,15 +131,15 @@
 
             // format the markup for the news
             let newsMarkup = `<div class="card"><h2>Top Headlines</h2>`;
-            if (headlines && headlines.articles) {
+            if (headlines && headlines.results) {
               newsMarkup += `<ul>`;
-              headlines.articles.slice(0, 5).forEach((article) => {
+              headlines.results.slice(0, 5).forEach((article) => {
                 newsMarkup += `
                   <li style="margin-bottom: 10px;">
                     <a href="${article.url}" target="_blank">
                       <strong>${article.title}</strong>
                     </a>
-                    <p>${article.source.name}</p>
+                    <p>${article.source_name}</p>
                   </li>`;
               });
               newsMarkup += `</ul>`;
@@ -150,6 +150,7 @@
 
             this.setHeadlines(newsMarkup);
           } catch (error) {
+            alert(error);
             this.setHeadlinesError(
               "Unable to fetch the news. Please try again later."
             );
@@ -310,9 +311,8 @@
       }
 
       async function fetchNews() {
-        const apiKey = "f61ee3dc7d5e44648f9ecd3995d1bfae";
-        const url =
-          "https://cors-anywhere.herokuapp.com/https://newsapi.org/v2/top-headlines?country=us";
+        const apiKey = "pub_62919987cd1556e31f28cd27576382d2ca8a0";
+        const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=us`;
 
         try {
           const response = await axios.get(url, {
