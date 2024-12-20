@@ -311,10 +311,14 @@
 
       async function fetchNews() {
         const apiKey = "f61ee3dc7d5e44648f9ecd3995d1bfae";
-        const url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+        const url = `https://newsapi.org/v2/top-headlines?country=us`;
 
         try {
-          const response = await axios.get(url);
+          const response = await axios.get(url, {
+            headers: {
+              "X-Api-Key": apiKey,
+            },
+          });
           const newsData = response.data;
           console.log(newsData);
           return newsData;
