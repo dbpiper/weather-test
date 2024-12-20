@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>FreightWise Programming Test</title>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      "use strict";
+
+      // This map converts the Open-Meteo weather condition codes to a friendly name
+      const WEATHER_DESCRIPTIONS = {
+        0: "Clear sky",
+        1: "Mainly clear",
+        2: "Partly cloudy",
+        3: "Overcast",
+        45: "Fog",
+        48: "Depositing rime fog",
+        51: "Light drizzle",
+        53: "Moderate drizzle",
+        55: "Dense drizzle",
+        56: "Light freezing drizzle",
+        57: "Dense freezing drizzle",
+        61: "Slight rain",
+        63: "Moderate rain",
+        65: "Heavy rain",
+        66: "Light freezing rain",
+        67: "Heavy freezing rain",
+        71: "Slight snowfall",
+        73: "Moderate snowfall",
+        75: "Heavy snowfall",
+        77: "Snow grains",
+        80: "Slight rain showers",
+        81: "Moderate rain showers",
+        82: "Violent rain showers",
+        85: "Slight snow showers",
+        86: "Heavy snow showers",
+        95: "Slight or moderate thunderstorm",
+        96: "Thunderstorm with slight hail",
+        99: "Thunderstorm with heavy hail",
+      };
+
+      /**
+       * Software Developer test.
+       *
+       * Doing research and making API calls are an important part of what we do at FreightWise.  This test will
+       * demonstrate your abilities to:
+       *
+       * - Make an API call
+       * - Research an API
+       * - Do basic DOM manipulation
+       * - Parse data
+       * - Handle errors
+       * - Be creative
+       *
+       * Feel free to ask any questions you may have.  Use a lot of comments, and explain why you are doing things.
+       * Don't spend more than 1-2 hours on it - we aren't expecting a finished product, but it should work and look
+       * nice.  Feel free to use any third party libraries, and if you do so, explain why you used them instead of
+       * built in browser APIs.
+       *
+       * Instructions:
+       * - Use the axios (https://github.com/axios/axios) request library to make an API call to the OpenWeatherMap
+       *   API for Current Weather Data using this API key:  25e989bd41e3e24ce13173d8126e0fd6
+       *   We've already imported this library to get you started.
+       * - Use either async/await or Promises.
+       * - Get the weather for Brentwood, TN, and write it to the DOM using the `setResults` method below.  Be
+       *   creative and make it look nice.
+       * - Handle errors and use the `setError` method below to display the error.  Also make it look nice.
+       * - If you find any mistakes in the test, fix them, and leave a comment about what you fixed and why.
+       * - Make sure your code is readable and maintainable.
+       * - Use plenty of descriptive comments.
+       * - Make sure your code runs in the latest version of Google Chrome and Firefox (ES6 is allowed).
+       * - Make your code live (GitHub with GitHub pages works nice).
+       * - Send a link to your finished test to dev-team-jobs@freightwisellc.com.
+       *
+       * Feel free to add your own twist to it (completely optional).  Here are a few ideas:
+       * - Sign up for NewsAPI.org and get the Top Headlines and show them along with the weather.
+       * - Use the browser location API to get the user's current location, and show that location's weather.
+       * - Show a satellite map of the weather in Brentwood.
+       * - Request a user's phone number and send them an SMS with the weather.
+       */
+      class Test {
+        constructor() {
+          this.testResults = document.getElementsByClassName("test-results")[0];
+          this.headlines = document.getElementById("headlines");
+        }
+
+        async run() {
+          console.log(new Date().toISOString(), "[Test]", "Running the test");
+
+          this.fetchWeatherAndDisplay();
+          this.fetchNewsAndDisplay();
+        }
+
+        async fetchWeatherAndDisplay() {
+          try {
+            const weather = await fetchWeather();
+
+            const { temperature, windspeed, weathercode } =
+              weather.current_weather;
+            const condition =
+              WEATHER_DESCRIPTIONS[weathercode] || "Unknown conditions";
+
+            // we format the html for the weather display here
+            const formattedResult = `
+            <div class="card">
+                <h1>Weather in Brentwood, TN</h1>
+                <p>Temperature: ${temperature}°F</p>
+                <p>Wind Speed: ${windspeed} km/h</p>
+                <p>Condition: ${condition}</p>
+            </div>
+            `;
+
+            this.setResults(formattedResult);
+          } catch (error) {
+            this.setError(
+              "Unable to fetch the weather. Please try again later."
+            );
+          }
+        }
+
+        async fetchNewsAndDisplay() {
+          try {
+            const headlines = await fetchNews();
+
+            // format the markup for the news
+            let newsMarkup = `<div class="card"><h2>Top Headlines</h2>`;
+            if (headlines && headlines.articles) {
+              newsMarkup += `<ul>`;
+              headlines.articles.slice(0, 5).forEach((article) => {
+                newsMarkup += `
+                  <li style="margin-bottom: 10px;">
+                    <a href="${article.url}" target="_blank">
+                      <strong>${article.title}</strong>
+                    </a>
+                    <p>${article.source.name}</p>
+                  </li>`;
+              });
+              newsMarkup += `</ul>`;
+            } else {
+              newsMarkup += `<p>No headlines available</p>`;
+            }
+            newsMarkup += `</div>`;
+
+            this.setHeadlines(newsMarkup);
+          } catch (error) {
+            this.setHeadlinesError(
+              "Unable to fetch the news. Please try again later."
+            );
+          }
+        }
+
+        setError(message) {
+          this.testResults.innerHTML = (message || "").toString();
+        }
+
+        setResults(results) {
+          this.testResults.innerHTML = (results || "").toString();
+        }
+
+        setHeadlinesError(error) {
+          this.headlines.innerHTML = (error || "").toString();
+        }
+
+        setHeadlines(headlines) {
+          this.headlines.innerHTML = (headlines || "").toString();
+        }
+      }
+    </script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Roboto", sans-serif;
+        background: linear-gradient(to bottom, #eef2f3, #8e9eab);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .test-results,
+      #headlines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .card {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .card h1,
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .card p {
+        margin: 10px 0;
+        color: #555;
+      }
+
+      .button-container {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .button-container > button {
+        margin: 0;
+        padding: 10px 20px;
+        color: white;
+        background-color: #008000;
+        border: none;
+        border-radius: 3px;
+        transition: all 200ms ease-in-out;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .button-container > button:hover {
+        background-color: #00a000;
+      }
+
+      .button-container > button:active {
+        background-color: #006000;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="test-results"></div>
+    <div id="headlines"></div>
+
+    <div class="button-container"></div>
+
+    <script>
+      "use strict";
+
+      // the weather api that we are using wants lat lon not a city name
+      // so we use this function to convert a city and state to a lat lon
+      async function fetchCoordinates(city, state) {
+        // our geocoding api
+        const geocodeUrl = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(
+          city
+        )}&state=${encodeURIComponent(state)}
+        &format=json&limit=1`;
+
+        try {
+          const response = await axios.get(geocodeUrl);
+          const data = response.data;
+
+          if (!data || data.length === 0) {
+            throw new Error(`No coordinates found for city: ${city}`);
+          }
+
+          // Extract latitude and longitude from the first result
+          const { lat, lon } = data[0];
+          return { lat, lon };
+        } catch (error) {
+          console.error("Error fetching city coordinates:", error.message);
+          throw error;
+        }
+      }
+
+      async function fetchWeather() {
+        // This was expired leaving it in for the sake of completeness
+        // const apiKey = "25e989bd41e3e24ce13173d8126e0fd6";
+        const city = "Brentwood";
+        const state = "TN";
+
+        const { lat, lon } = await fetchCoordinates(city, state);
+
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=fahrenheit`;
+
+        // The OpenWeatherMap API key has expired so I had to use another weather API
+        // const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
+
+        try {
+          const response = await axios.get(url);
+          const weatherData = response.data;
+          console.log(weatherData);
+          return weatherData;
+        } catch (error) {
+          console.error("Error fetching the weather data:", error.message);
+          throw error;
+        }
+      }
+
+      async function fetchNews() {
+        const apiKey = "f61ee3dc7d5e44648f9ecd3995d1bfae";
+        const url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+
+        try {
+          const response = await axios.get(url);
+          const newsData = response.data;
+          console.log(newsData);
+          return newsData;
+        } catch (error) {
+          console.error("Error fetching the news data:", error.message);
+          throw error;
+        }
+      }
+
+      /**
+       * Creates a button for kicking off the test and adds it to the DOM.
+       *
+       * @param {HTMLElement} context  the parent element to add the button to
+       * @param {Test}        test     the test to be executed
+       * @returns {HTMLElement} the button added to the test
+       */
+      function addButtonForTest(context, test) {
+        let testButton = document.createElement("button");
+
+        testButton.type = "button";
+        testButton.innerText = "Get the Brentwood Weather and National News";
+        testButton.onclick = () => test.run();
+
+        context.appendChild(testButton);
+
+        return testButton;
+      }
+
+      // Create the Test and add a button to the UI for running the test
+      const test = new Test();
+      const buttonContainer =
+        document.getElementsByClassName("button-container")[0];
+
+      addButtonForTest(buttonContainer, test);
+    </script>
+  </body>
+</html>
