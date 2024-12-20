@@ -311,7 +311,8 @@
 
       async function fetchNews() {
         const apiKey = "f61ee3dc7d5e44648f9ecd3995d1bfae";
-        const url = `https://newsapi.org/v2/top-headlines?country=us`;
+        const url =
+          "https://cors-anywhere.herokuapp.com/https://newsapi.org/v2/top-headlines?country=us";
 
         try {
           const response = await axios.get(url, {
