@@ -98,6 +98,7 @@
           this.fetchNewsAndDisplay();
         }
 
+        // this method fetches the weather from open-meteo.com and renders it as html
         async fetchWeatherAndDisplay() {
           try {
             const weather = await fetchWeather();
@@ -121,12 +122,14 @@
 
             this.setResults(formattedResult);
           } catch (error) {
+            // we render this error message if we get an error
             this.setError(
               "Unable to fetch the weather. Please try again later."
             );
           }
         }
 
+        // get the news from the newsdata api and render it as html
         async fetchNewsAndDisplay() {
           try {
             const headlines = await fetchNews();
@@ -180,6 +183,7 @@
 
             this.setHeadlines(newsMarkup);
           } catch (error) {
+            // if we get an error we render this error message instead
             this.setHeadlinesError(
               "Unable to fetch the news. Please try again later."
             );
