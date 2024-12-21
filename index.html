@@ -104,6 +104,8 @@
 
             const { temperature, windspeed, weathercode } =
               weather.current_weather;
+
+            // convert the condition code to a friendly name
             const condition =
               WEATHER_DESCRIPTIONS[weathercode] || "Unknown conditions";
 
@@ -133,7 +135,31 @@
             let newsMarkup = `<div class="card"><h2>Top Headlines</h2>`;
             if (headlines && headlines.results) {
               newsMarkup += `<ul>`;
-              headlines.results.slice(0, 5).forEach((article) => {
+
+              // only show articles that are in English
+              const englishArticles = headlines.results.filter(
+                (result) => result.language === "english"
+              );
+
+              // we are going to remove duplicate articles by keeping a set
+              // of the titles we have seen and only using those
+              const seenTitles = new Set();
+              const uniqueArticles = [];
+
+              // we add articles if they aren't already in the set of titles
+              // we have seen
+              englishArticles.forEach((article) => {
+                if (!seenTitles.has(article.title)) {
+                  seenTitles.add(article.title);
+                  uniqueArticles.push(article);
+                }
+              });
+
+              // we grab the top 5 articles and display them
+              const topArticles = uniqueArticles.slice(0, 5);
+
+              // create the html for each article
+              topArticles.forEach((article) => {
                 newsMarkup += `
                   <li style="margin-bottom: 10px;">
                     <a href="${article.url}" target="_blank">
@@ -285,6 +311,7 @@
         }
       }
 
+      // fetch the brentwood weather from open-meteo.com
       async function fetchWeather() {
         // This was expired leaving it in for the sake of completeness
         // const apiKey = "25e989bd41e3e24ce13173d8126e0fd6";
@@ -299,6 +326,7 @@
         // const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
 
         try {
+          // make the request to open-meteo.com with axios
           const response = await axios.get(url);
           const weatherData = response.data;
           console.log(weatherData);
@@ -309,16 +337,14 @@
         }
       }
 
+      // fetch the news from newsdata.io
       async function fetchNews() {
         const apiKey = "pub_62919987cd1556e31f28cd27576382d2ca8a0";
         const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=us`;
 
         try {
-          const response = await axios.get(url, {
-            headers: {
-              "X-Api-Key": apiKey,
-            },
-          });
+          // make the request to newsdata with axios
+          const response = await axios.get(url);
           const newsData = response.data;
           console.log(newsData);
           return newsData;
