@@ -136,6 +136,10 @@
             if (headlines && headlines.results) {
               newsMarkup += `<ul>`;
 
+              // we are removing duplicates and only showing English language
+              // articles at the API level but we also do it here so that we
+              // aren't dependent on any API calls to achieve these results
+
               // only show articles that are in English
               const englishArticles = headlines.results.filter(
                 (result) => result.language === "english"
@@ -340,7 +344,7 @@
       // fetch the news from newsdata.io
       async function fetchNews() {
         const apiKey = "pub_62919987cd1556e31f28cd27576382d2ca8a0";
-        const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=us`;
+        const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=us&language=en&removeduplicate=1`;
 
         try {
           // make the request to newsdata with axios
